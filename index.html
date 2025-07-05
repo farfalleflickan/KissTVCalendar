@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Kiss TV Calendar</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+  </head>
+  <body>
+    <div class="wrapper">
+      <form class="search" onsubmit="return false">
+        <div class="search-input-wrap">
+          <input type="text" id="search" placeholder="🔍 Search TV Shows...">
+          <button type="button" id="clearSearchBtn" title="Clear search">✖</button>
+        </div>
+        <div class="settings-menu">
+          <button id="settingsBtn" title="Settings">⚙️</button>
+          <div id="settingsDropdown" class="dropdown-content">
+            <button id="themeToggle"      type="button"><span class="icon" id="themeIcon">🌙</span><span>Switch Theme</span></button>
+            <button id="importBtn"        type="button"><span class="icon">📥</span><span>Import</span></button>
+            <button id="exportBtn"        type="button"><span class="icon">📤</span><span>Export</span></button>
+            <button id="exportCalBtn"     type="button"><span class="icon">📅</span><span>Export iCal (upcoming only)</span></button>
+            <button id="exportFullCalBtn" type="button"><span class="icon">🗓️</span><span>Export iCal (full)</span></button>
+            <button id="bookmarkBtn"      type="button"><span class="icon">🔗</span><span>Bookmark/Share</span></button>
+            <button id="clearCacheBtn"    type="button"><span class="icon">🔄</span><span>Refresh Cache</span></button>
+            <button id="clearStorageBtn"  type="button"><span class="icon">🗑️</span><span>Clear Storage</span></button>
+          </div>
+          <input type="file" id="importFileInput" accept="application/json"/>
+        </div>
+      </form>
+      <div id="searchSpinner">
+        <span class="spinner"></span> Searching...
+      </div>
+      <span id="results"></span>
+      <div class="controls">
+        <button id="prevMonth">&lt; Prev</button>
+        <span id="monthLabel"></span>
+        <button id="nextMonth">Next &gt;</button>
+      </div>
+      <div class="calendar-container">
+        <div class="calendar" id="calendar"></div>
+      </div>
+    </div>
+    <script type="text/javascript" src="crypt.js" integrity="sha384-drmZCx9yJY/XU/Bhpusd9Xv5QAPI1ppfEG1365Me27P8SLZJmRoWmHz/lkrTq1fD"></script>
+  </body>
+</html>

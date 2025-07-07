@@ -451,6 +451,14 @@ html.light {
   margin-bottom:0.5em;
 }
 
+#calendarSpinner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+}
+
 .spinner {
   display: inline-block;
   width: 18px;

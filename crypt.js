@@ -416,6 +416,7 @@ async function getAiringForShow(showId, year, month) {
 }
 
 async function renderCalendar() {
+    document.getElementById('calendarSpinner').style.display = 'flex';
     calendarElem.innerHTML = '';
     monthLabel.textContent = `${getMonthName(calendarMonth)} ${calendarYear}`;
     const now = new Date();
@@ -477,6 +478,7 @@ async function renderCalendar() {
 
     while ((dayGrid.length + 7) % 7 !== 0) dayGrid.push('<div class="day"></div>');
     calendarElem.innerHTML += dayGrid.join('');
+    document.getElementById('calendarSpinner').style.display = 'none';
 
     attachWatchedCheckboxListeners();
 }

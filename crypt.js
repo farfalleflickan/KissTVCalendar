@@ -436,43 +436,56 @@ async function renderCalendar() {
     }));
 
     const watchedArr = getWatchedEpisodes();
-
     const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     weekdays.forEach(d => {
         calendarElem.innerHTML += `<div class="weekday-label">${d}</div>`;
     });
 
+    const MAX_VISIBLE = 2;
     let dayGrid = [];
-    days.forEach((date, idx) => {
+
+    days.forEach(date => {
         if (!date) {
             dayGrid.push(`<div class="day"></div>`);
         } else {
             const dayStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
             const todayCls = (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) ? 'today' : '';
-            let shows = '';
+            let showsHtml = '';
+
             if (dayShows[dayStr]) {
-                shows = '<div class="shows">' + dayShows[dayStr].map(item => {
+                const allEpisodes = dayShows[dayStr];
+                const visibleEpisodes = allEpisodes.slice(0, MAX_VISIBLE);
+
+                showsHtml = '<div class="shows">' + visibleEpisodes.map(item => {
                     const epKey = item.show.id + '-' + item.ep.id;
                     const checked = watchedArr.includes(epKey);
                     return `<div class="show-tag ${checked ? 'watched' : ''}" data-epkey="${epKey}">
                                 <input type="checkbox" class="watch-checkbox" ${checked ? 'checked' : ''} title="Mark as watched"/>
-                                    <span>
-                                        <a href="${item.ep.url}" target="_blank" rel="noopener noreferrer" class="ep-link" title="Open episode page">
-                                            <span class="show-title">${item.show.name}</span>
-                                            ${item.ep.season && item.ep.number ? ` S${item.ep.season}E${item.ep.number}:` : ''} ${item.ep.name}
-                                        </a>
-                                    </span>
+                                <span>
+                                    <a href="${item.ep.url}" target="_blank" rel="noopener noreferrer" class="ep-link" title="Open episode page">
+                                        <span class="show-title">${item.show.name}</span>
+                                        ${item.ep.season && item.ep.number ? ` S${item.ep.season}E${item.ep.number}:` : ''} ${item.ep.name}
+                                    </a>
+                                </span>
                                 <button class="remove-btn" title="Remove from Calendar" onclick="removeSubscription(${item.show.id})">&times;</button>
                             </div>`;
-                }).join('') + '</div>';
+                }).join('');
+
+                if (allEpisodes.length > MAX_VISIBLE) {
+                    showsHtml += `<button class="expand-btn" data-day="${dayStr}">
+                        +${allEpisodes.length - MAX_VISIBLE} more
+                    </button>`;
+                }
+
+                showsHtml += '</div>';
             }
 
             dayGrid.push(`
-            <div class="day ${todayCls}">
-              <strong>${date.getDate()}</strong>
-              ${shows}
-            </div>
-          `);
+                <div class="day ${todayCls}">
+                  <strong>${date.getDate()}</strong>
+                  ${showsHtml}
+                </div>
+            `);
         }
     });
 
@@ -480,20 +493,46 @@ async function renderCalendar() {
     calendarElem.innerHTML += dayGrid.join('');
     document.getElementById('calendarSpinner').style.display = 'none';
 
-    attachWatchedCheckboxListeners();
-}
-
-function attachWatchedCheckboxListeners() {
-    document.querySelectorAll('.show-tag input.watch-checkbox').forEach(cb => {
-        cb.addEventListener('change', function () {
-            const tag = cb.closest('.show-tag');
-            const epkey = tag.getAttribute('data-epkey');
-            toggleEpisodeWatched(epkey, cb.checked);
-            if (cb.checked) tag.classList.add('watched');
-            else tag.classList.remove('watched');
+    // Attach expand button listeners
+    document.querySelectorAll('.expand-btn').forEach(btn => {
+        const day = btn.dataset.day;
+        btn.addEventListener('click', () => {
+            const episodesForDay = dayShows[day] || [];
+            openEpisodesModal(episodesForDay);
         });
     });
 }
+
+function openEpisodesModal(episodes) {
+    const modal = document.getElementById('episodesModal');
+    const modalEpisodes = document.getElementById('episodesModalDiv');
+    modalEpisodes.innerHTML = '';
+
+    episodes.forEach(item => {
+        const epKey = item.show.id + '-' + item.ep.id;
+        const checked = getWatchedEpisodes().includes(epKey);
+        modalEpisodes.innerHTML += `
+            <div class="show-tag ${checked ? 'watched' : ''}" data-epkey="${epKey}">
+                <input type="checkbox" class="watch-checkbox" ${checked ? 'checked' : ''} title="Mark as watched"/>
+                <span>
+                    <a href="${item.ep.url}" target="_blank" rel="noopener noreferrer" class="ep-link" title="Open episode page">
+                        <span class="show-title">${item.show.name}</span>
+                        ${item.ep.season && item.ep.number ? ` S${item.ep.season}E${item.ep.number}:` : ''} ${item.ep.name}
+                    </a>
+                </span>
+                <button class="remove-btn" title="Remove from Calendar" onclick="removeSubscription(${item.show.id})">&times;</button>
+            </div>
+        `;
+    });
+
+    modal.style.display = 'block';
+}
+
+window.onclick = (event) => {
+    if (event.target === document.getElementById('episodesModal')) {
+        document.getElementById('episodesModal').style.display = 'none';
+    }
+};
 
 searchElem.addEventListener('input', function (e) {
     const q = e.target.value;
@@ -534,6 +573,22 @@ window.addSubById = (showId) => {
         searchElem.value = '';
     }
 }
+
+document.addEventListener('change', function(e) {
+    if (e.target.matches('.show-tag input.watch-checkbox')) {
+        const tag = e.target.closest('.show-tag');
+        const epkey = tag.getAttribute('data-epkey');
+        toggleEpisodeWatched(epkey, e.target.checked);
+        const elements = document.querySelectorAll(`[data-epkey="${epkey}"]`);
+        elements.forEach(el => {
+            if (e.target.checked) { 
+                el.classList.add('watched');
+            } else {
+                el.classList.remove('watched');
+            }
+        });
+    }
+});
 
 window.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);

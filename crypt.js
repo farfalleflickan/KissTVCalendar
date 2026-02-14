@@ -44,7 +44,10 @@ function removeSubscription(showId) {
         subs = subs.filter(f => f.id !== showId);
         localStorage.setItem('ktc_subShows', JSON.stringify(subs));
         renderCalendar();
+        return true
     }
+
+    return false
 }
 
 function getEpisodesCache() {
@@ -528,9 +531,43 @@ function openEpisodesModal(episodes) {
     modal.style.display = 'block';
 }
 
+function openSubscriptionsModal() {
+    const modal = document.getElementById('subscriptionsModal');
+    const modalDiv = document.getElementById('subscriptionsModalDiv');
+    const subs = getSubscriptions();
+    
+    if (subs.length === 0) {
+        modalDiv.innerHTML = '<p style="text-align: center; padding: 20px; color: #999;">No subscriptions yet. Search for shows to add them!</p>';
+    } else {
+        modalDiv.innerHTML = subs.map(show => `
+            <div class="show-tag">
+                <span>
+                    <a href="https://www.tvmaze.com/shows/${show.id}" target="_blank" rel="noopener noreferrer" class="ep-link" title="Open show page">
+                        <span class="show-title">${show.name}</span>
+                    </a>
+                </span>
+                <button class="remove-btn" onclick="removeSubscriptionFromModal(${show.id})" title="Unsubscribe">&times;</button>
+            </div>`).join('');
+    }
+    
+    modal.style.display = 'block';
+}
+
+function removeSubscriptionFromModal(showId) {
+    if (removeSubscription(showId)) {
+        openSubscriptionsModal();
+    }
+}
+
 window.onclick = (event) => {
-    if (event.target === document.getElementById('episodesModal')) {
-        document.getElementById('episodesModal').style.display = 'none';
+    const episodesModal = document.getElementById('episodesModal');
+    const subscriptionsModal = document.getElementById('subscriptionsModal');
+    
+    if (event.target === episodesModal) {
+        episodesModal.style.display = 'none';
+    }
+    if (event.target === subscriptionsModal) {
+        subscriptionsModal.style.display = 'none';
     }
 };
 
@@ -631,6 +668,12 @@ window.addEventListener('DOMContentLoaded', () => {
         setTheme(!document.documentElement.classList.contains('light'));
     };
 
+    document.getElementById('manageSubsBtn').onclick = function (e) {
+        e.preventDefault();
+        openSubscriptionsModal();
+        menu.classList.remove('open');
+    };
+
     document.getElementById('exportCalBtn').onclick = function (e) {
         e.preventDefault();
         exportIcal(false);
@@ -689,6 +732,7 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     window.removeSubscription = removeSubscription;
+    window.removeSubscriptionFromModal = removeSubscriptionFromModal;
     setTheme(getTheme(), false);
     renderCalendar();
 });

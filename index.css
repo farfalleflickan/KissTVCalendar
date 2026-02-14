@@ -118,7 +118,7 @@ h1 {
   display: none;
   position: fixed;
   z-index: 1000;
-  padding-top: 100px;
+  padding-top: 3%;
   left: 0;
   top: 0;
   width: 100%;
@@ -130,6 +130,7 @@ h1 {
 .modal-content {
   background-color: var(--card);
   margin: auto;
+  margin-bottom: 5%;
   padding: 20px;
   border-radius: var(--radius);
   max-width: 500px;
@@ -292,7 +293,7 @@ h1 {
   background: #c4316e33;
 }
 
-#episodesModalDiv .show-tag {
+#episodesModalDiv .show-tag, #subscriptionsModal .show-tag  {
   background: var(--bg-show);
   color: var(--primary);
   border-left: 4px solid var(--accent);
@@ -610,12 +611,6 @@ html.light {
     padding: 0.3em 0.6em;
   }
 
-  .show-tag {
-    font-size: 0.96em;
-    padding: 0.16em 0.3em 0.16em 0.35em;
-    gap: 0.4em;
-  }
-
   #toast {
     font-size: 0.97em;
     padding: 0.7em 0.7em;
@@ -624,5 +619,36 @@ html.light {
     min-width: unset;
     max-width: 96vw;
     transform: none;
+  }
+
+  .modal {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .modal-content {
+    border-radius: 12px;
+    width: 75vw;
+    margin-bottom: 2em;
+  }
+
+  #episodesModalDiv .show-tag, #subscriptionsModal .show-tag {
+    font-size: 0.95em;
+    padding: 0;
+    padding-left: 1em;
+  }
+
+  .show-tag .remove-btn,
+  .subscription-remove-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .show-tag input[type="checkbox"] {
+    transform: scale(1.4);
+    margin-right: 10px;
   }
 }

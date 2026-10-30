@@ -395,6 +395,11 @@ async function getAiringForShow(showId, year, month) {
     const oneDay = 24 * 60 * 60 * 1000;
 
     function filterEpisodes(episodes) {
+        if (!Array.isArray(episodes)) {
+            console.warn("Malformed episodes", episodes);
+            return [];
+        }
+
         return episodes.filter(ep => {
             if (!ep.airdate) return false;
             const [y, m, d] = ep.airdate.split('-').map(Number);
